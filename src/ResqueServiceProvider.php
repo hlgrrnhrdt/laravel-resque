@@ -34,7 +34,7 @@ class ResqueServiceProvider extends ServiceProvider
     {
         $this->app->singleton(Resque::class, function () {
             $prefix = $this->app['config']['resque.prefix'];
-            return (new Resque())->setPrefix($prefix);
+            return (new Resque())->setPrefix($prefix ?: 'resque');
         });
     }
 

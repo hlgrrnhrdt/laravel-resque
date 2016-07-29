@@ -22,6 +22,6 @@ return [
     |
     */
 
-    'prefix' => env('RESQUE_PREFIX', null),
+    'prefix' => env('RESQUE_PREFIX', 'resque'),
 
 ];
