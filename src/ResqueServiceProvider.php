@@ -1,7 +1,6 @@
 <?php
 namespace Hlgrrnhrdt\Resque;
 
-use Config;
 use Hlgrrnhrdt\Resque\Console\WorkCommand;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -44,5 +43,6 @@ class ResqueServiceProvider extends ServiceProvider
         $this->app->singleton('command.resque.work', function (Application $app) {
             return new WorkCommand($app->make('resque.manager'));
         });
+        $this->commands('command.resque.work');
     }
 }
