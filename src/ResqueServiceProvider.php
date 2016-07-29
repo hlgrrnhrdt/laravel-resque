@@ -16,8 +16,7 @@ class ResqueServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $connection = $this->app['config']['resque.connection'];
-        \Resque::setBackend($connection['server'], $connection['db']);
+        $this->setRedisConfig();
     }
 
     /**
@@ -33,8 +32,8 @@ class ResqueServiceProvider extends ServiceProvider
 
     protected function registerResque()
     {
-        $this->app->singleton('resque', function () {
-            $prefix = $connection = $this->app['config']['resque.prefix'];
+        $this->app->singleton(Resque::class, function () {
+            $prefix = $this->app['config']['resque.prefix'];
             return (new Resque())->setPrefix($prefix);
         });
     }
@@ -42,8 +41,21 @@ class ResqueServiceProvider extends ServiceProvider
     protected function registerWorkCommand()
     {
         $this->app->singleton('command.resque.work', function () {
-            return new WorkCommand($this->app->make('resque.manager'));
+            return new WorkCommand($this->app->make(Resque::class));
         });
         $this->commands('command.resque.work');
+    }
+
+    protected function setRedisConfig()
+    {
+        $config = $this->app['config']['resque.connection'];
+
+        $host = isset($config['host']) ? $config['host'] : 'localhost';
+        $port = isset($config['port']) ? $config['port'] : 6379;
+        $database = isset($config['database']) ? $config['database'] : 0;
+
+        $server = implode(':', [$host, $port]);
+
+        \Resque::setBackend($server, $database);
     }
 }

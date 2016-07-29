@@ -21,14 +21,6 @@ class Resque
     protected $trackStatus = false;
 
     /**
-     *
-     */
-    public function __construct($connection = null)
-    {
-
-    }
-
-    /**
      * @param string $prefix
      */
     public function setPrefix($prefix)
@@ -64,7 +56,7 @@ class Resque
         $queue = new Queue($job->queue());
 
         foreach ($queue->jobs() as $queuedJob) {
-            if (true === $this->isDuplicateJob($job, $queuedJob)) {
+            if (true === $this->isSameJob($job, $queuedJob)) {
                 return ($trackStatus) ? new \Resque_Job_Status($queuedJob->job->payload['id']) : null;
             }
         }
@@ -96,7 +88,7 @@ class Resque
      *
      * @return bool
      */
-    private function isDuplicateJob(Job $job, Job $queuedJob)
+    protected function isSameJob(Job $job, Job $queuedJob)
     {
         return $job->name() === $queuedJob->name()
             && count(array_intersect($job->arguments(), $queuedJob->arguments())) === count($job->arguments());

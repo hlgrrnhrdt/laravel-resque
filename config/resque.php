@@ -10,8 +10,9 @@ return [
     */
 
     'connection' => [
-        'server' => env('RESQUE_REDIS_SERVER', 'localhost:6379'),
-        'db'   => env('RESQUE_REDIS_DB', 0),
+        'host'     => env('RESQUE_REDIS_HOST', 'localhost'),
+        'port'     => env('RESQUE_REDIS_PORT', 6379),
+        'database' => env('RESQUE_REDIS_DATABASE', 0),
     ],
 
     /*
@@ -22,6 +23,5 @@ return [
     */
 
     'prefix' => env('RESQUE_PREFIX', null),
-    'trackStatus' => env('RESQUE_TRACK_STATUS', false),
 
 ];
