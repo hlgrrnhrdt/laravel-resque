@@ -22,10 +22,13 @@ class Resque
 
     /**
      * @param string $prefix
+     *
+     * @return Resque
      */
     public function setPrefix($prefix)
     {
         \Resque_Redis::prefix($prefix);
+        return $this;
     }
 
     /**
