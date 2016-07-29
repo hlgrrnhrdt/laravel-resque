@@ -29,7 +29,7 @@ class ResqueServiceProvider extends ServiceProvider
             $config = $this->app['config']['resque.connection'];
 
             $resque = new Resque();
-            $resque->setBackend(implode(':', [$config['host'], $config['port']]), $config['db']);
+            $resque->setBackend($config['server'], $config['db']);
 
             return new ResqueManager($resque, $this->app['config']['resque.trackStatus']);
         });

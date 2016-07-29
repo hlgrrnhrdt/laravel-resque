@@ -62,10 +62,8 @@ class ResqueManager
         $queue = new Queue($job->queue());
 
         foreach ($queue->jobs() as $queuedJob) {
-            if ($job->payload['class'] === get_class($queuedJob) && count(array_intersect($queuedJob->getArguments(),
-                    $job->arguments())) === $job->arguments()
-            ) {
-                return ($trackStatus) ? new \Resque_Job_Status($job->payload['id']) : null;
+            if (true === $this->isDuplicateJob($job, $queuedJob)) {
+                return ($trackStatus) ? new \Resque_Job_Status($queuedJob->payload['id']) : null;
             }
         }
 
@@ -100,18 +98,14 @@ class ResqueManager
     }
 
     /**
-     * @param array $queues
-     * @param int   $interval
-     * @param int   $logLevel
+     * @param \Hlgrrnhrdt\Resque\Job $job
+     * @param                        $queuedJob
      *
-     * @return \Resque_Worker
+     * @return bool
      */
-    public function startWorker(array $queues, $interval = 5, $logLevel = Resque_Worker::LOG_NONE)
+    private function isDuplicateJob(Job $job, \Resque_Job $queuedJob)
     {
-        $worker = new Resque_Worker($queues);
-        $worker->logLevel = $logLevel;
-        $worker->work($interval);
-
-        return $worker;
+        return $queuedJob->payload['class'] === get_class($queuedJob)
+            && count(array_intersect($queuedJob->getArguments(), $job->arguments())) === count($job->arguments());
     }
 }

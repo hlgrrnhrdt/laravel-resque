@@ -10,8 +10,7 @@ return [
     */
 
     'connection' => [
-        'host' => env('RESQUE_REDIS_HOST', 'localhost'),
-        'port' => env('RESQUE_REDIS_PORT', 6379),
+        'server' => env('RESQUE_REDIS_SERVER', 'localhost:6379'),
         'db'   => env('RESQUE_REDIS_DB', 0),
     ],
 
