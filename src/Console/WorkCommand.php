@@ -111,7 +111,7 @@ class WorkCommand extends IlluminateCommand
             [
                 'queue',
                 null,
-                InputOption::VALUE_IS_ARRAY & InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'The queue to work on',
                 'default',
             ],
