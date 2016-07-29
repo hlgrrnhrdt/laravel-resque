@@ -76,9 +76,9 @@ class WorkCommand extends IlluminateCommand
      */
     private function startWorker(array $queues, $interval = 5, $logLevel = Resque_Worker::LOG_NONE)
     {
-        $queues = array_walk($queues, function ($queue) {
-            return $this->manager->getQueue($queue);
-        });
+        $queues = array_map(function ($queue) {
+            return $this->manager->getQueueName($queue);
+        }, $queues);
 
         $worker = new Resque_Worker($queues);
         $worker->logLevel = $logLevel;
