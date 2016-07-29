@@ -2,7 +2,6 @@
 namespace Hlgrrnhrdt\Resque;
 
 use Resque;
-use Resque_Worker;
 use RuntimeException;
 
 /**
@@ -18,6 +17,11 @@ class ResqueManager
     protected $resque;
 
     /**
+     * @var string
+     */
+    protected $queuePrefix;
+
+    /**
      * @var bool
      */
     protected $trackStatus = false;
@@ -26,12 +30,14 @@ class ResqueManager
      * ResqueManager constructor.
      *
      * @param \Resque $resque
+     * @param string  $queuePrefix
      * @param bool    $trackStatus
      */
-    public function __construct(Resque $resque, $trackStatus = false)
+    public function __construct(Resque $resque, $queuePrefix, $trackStatus = false)
     {
         $this->resque = $resque;
         $this->trackStatus = $trackStatus;
+        $this->queuePrefix = $queuePrefix;
     }
 
     /**
@@ -42,7 +48,7 @@ class ResqueManager
      */
     public function enqueue(Job $job, $trackStatus = false)
     {
-        $id = $this->resque->enqueue($job->queue(), get_class($job), $job->arguments(), $trackStatus);
+        $id = $this->resque->enqueue($this->getQueueName($job), get_class($job), $job->arguments(), $trackStatus);
 
         if (true === $trackStatus) {
             return new \Resque_Job_Status($id);
@@ -107,5 +113,15 @@ class ResqueManager
     {
         return $queuedJob->payload['class'] === get_class($queuedJob)
             && count(array_intersect($queuedJob->getArguments(), $job->arguments())) === count($job->arguments());
+    }
+
+    private function getQueueName(Job $job)
+    {
+        $queue = $job->queue();
+        if ($this->queuePrefix) {
+            $queue = implode(':', [$this->queuePrefix, $queue]);
+        }
+
+        return $queue;
     }
 }

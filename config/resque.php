@@ -21,6 +21,7 @@ return [
     |
     */
 
+    'queuePrefix' => env('RESQUE_QUEUE_PREFIX', null),
     'trackStatus' => env('RESQUE_TRACK_STATUS', false),
 
 ];
