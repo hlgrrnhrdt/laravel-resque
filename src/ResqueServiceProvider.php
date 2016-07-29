@@ -3,6 +3,7 @@ namespace Hlgrrnhrdt\Resque;
 
 use Config;
 use Hlgrrnhrdt\Resque\Console\WorkCommand;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Resque;
 
@@ -24,20 +25,24 @@ class ResqueServiceProvider extends ServiceProvider
         $this->registerWorkCommand();
     }
 
+
+
     protected function registerManager()
     {
-        $this->app->singleton(ResqueManager::class, function ($app) {
+        $this->app->singleton('resque.manager', function (Application $app) {
             $config = $app['config']['resque.connection'];
+
             $resque = new Resque();
             $resque->setBackend(implode(':', [$config['host'], $config['port']]), $config['db']);
-            return new ResqueManager($resque);
+
+            return new ResqueManager($resque, $app['config']['resque.trackStatus']);
         });
     }
 
     protected function registerWorkCommand()
     {
-        $this->app->singleton('command.resque.work', function () {
-            return new WorkCommand();
+        $this->app->singleton('command.resque.work', function (Application $app) {
+            return new WorkCommand($app->make('resque.manager'));
         });
     }
 }

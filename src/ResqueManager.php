@@ -2,6 +2,7 @@
 namespace Hlgrrnhrdt\Resque;
 
 use Resque;
+use Resque_Worker;
 use RuntimeException;
 
 /**
@@ -12,13 +13,25 @@ use RuntimeException;
 class ResqueManager
 {
     /**
-     * @var PhpResque
+     * @var Resque
      */
-    private $resque;
+    protected $resque;
 
-    public function __construct(Resque $resque)
+    /**
+     * @var bool
+     */
+    protected $trackStatus = false;
+
+    /**
+     * ResqueManager constructor.
+     *
+     * @param \Resque $resque
+     * @param bool    $trackStatus
+     */
+    public function __construct(Resque $resque, $trackStatus = false)
     {
         $this->resque = $resque;
+        $this->trackStatus = $trackStatus;
     }
 
     /**
@@ -84,5 +97,21 @@ class ResqueManager
         }
 
         return $pid;
+    }
+
+    /**
+     * @param array $queues
+     * @param int   $interval
+     * @param int   $logLevel
+     *
+     * @return \Resque_Worker
+     */
+    public function startWorker(array $queues, $interval = 5, $logLevel = Resque_Worker::LOG_NONE)
+    {
+        $worker = new Resque_Worker($queues);
+        $worker->logLevel = $logLevel;
+        $worker->work($interval);
+
+        return $worker;
     }
 }
