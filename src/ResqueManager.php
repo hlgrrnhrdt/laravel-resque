@@ -48,7 +48,7 @@ class ResqueManager
      */
     public function enqueue(Job $job, $trackStatus = false)
     {
-        $id = $this->resque->enqueue($this->getQueueName($job), get_class($job), $job->arguments(), $trackStatus);
+        $id = $this->resque->enqueue($this->getQueueFromJob($job), get_class($job), $job->arguments(), $trackStatus);
 
         if (true === $trackStatus) {
             return new \Resque_Job_Status($id);
@@ -65,7 +65,7 @@ class ResqueManager
      */
     public function enqueueOnce(Job $job, $trackStatus = false)
     {
-        $queue = new Queue($job->queue());
+        $queue = new Queue($this->getQueueFromJob($job));
 
         foreach ($queue->jobs() as $queuedJob) {
             if (true === $this->isDuplicateJob($job, $queuedJob)) {
@@ -115,9 +115,20 @@ class ResqueManager
             && count(array_intersect($queuedJob->getArguments(), $job->arguments())) === count($job->arguments());
     }
 
-    private function getQueueName(Job $job)
+    private function getQueueFromJob(Job $job)
     {
         $queue = $job->queue();
+
+        return $this->getQueue($queue);
+    }
+
+    /**
+     * @param string $queue
+     *
+     * @return string
+     */
+    public function getQueue($queue)
+    {
         if ($this->queuePrefix) {
             $queue = implode(':', [$this->queuePrefix, $queue]);
         }

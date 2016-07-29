@@ -42,7 +42,7 @@ class WorkCommand extends IlluminateCommand
      */
     public function fire()
     {
-        $queue = $this->option('queue');
+        $queues = $this->option('queue');
         $interval = (int)$this->option('interval');
         $count = (int)$this->option('count');
 
@@ -59,11 +59,11 @@ class WorkCommand extends IlluminateCommand
                 }
 
                 if (0 === $pid) {
-                    $this->startWorker($queue, $interval, $logLevel);
+                    $this->startWorker($queues, $interval, $logLevel);
                 }
             }
         } else {
-            $this->startWorker($queue, $interval, $logLevel);
+            $this->startWorker($queues, $interval, $logLevel);
         }
 
         return 0;
@@ -76,6 +76,10 @@ class WorkCommand extends IlluminateCommand
      */
     private function startWorker(array $queues, $interval = 5, $logLevel = Resque_Worker::LOG_NONE)
     {
+        $queues = array_walk($queues, function ($queue) {
+            return $this->manager->getQueue($queue);
+        });
+
         $worker = new Resque_Worker($queues);
         $worker->logLevel = $logLevel;
 
