@@ -36,7 +36,15 @@ abstract class Job
      */
     public function arguments()
     {
-        return $this->$args;
+        return $this->args;
+    }
+
+    /**
+     * @return string
+     */
+    public function name()
+    {
+        return \get_class($this);
     }
 
     /**

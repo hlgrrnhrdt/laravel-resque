@@ -1,11 +1,10 @@
 <?php
 namespace Hlgrrnhrdt\Resque\Console;
 
-use Hlgrrnhrdt\Resque\ResqueManager;
+use Hlgrrnhrdt\Resque\Resque;
 use Illuminate\Console\Command as IlluminateCommand;
 use Resque_Worker;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * WorkCommand
@@ -22,17 +21,17 @@ class WorkCommand extends IlluminateCommand
     protected $name = 'resque:work';
 
     /**
-     * @var \Hlgrrnhrdt\Resque\ResqueManager
+     * @var \Hlgrrnhrdt\Resque\Resque
      */
-    private $manager;
+    private $resque;
 
     /**
-     * @param \Hlgrrnhrdt\Resque\ResqueManager $manager
+     * @param \Hlgrrnhrdt\Resque\Resque $resque
      */
-    public function __construct(ResqueManager $manager)
+    public function __construct(Resque $resque)
     {
         parent::__construct();
-        $this->manager = $manager;
+        $this->resque = $resque;
     }
 
     /**
@@ -46,12 +45,10 @@ class WorkCommand extends IlluminateCommand
         $interval = (int)$this->option('interval');
         $count = (int)$this->option('count');
 
-        $logLevel = $this->getLogLevel();
-
         if ($count > 1) {
             for ($i = 0; $i < $count; $i++) {
                 try {
-                    $pid = $this->manager->fork();
+                    $pid = $this->resque->fork();
                 } catch (\RuntimeException $exception) {
                     $this->error($exception->getMessage());
 
@@ -59,11 +56,11 @@ class WorkCommand extends IlluminateCommand
                 }
 
                 if (0 === $pid) {
-                    $this->startWorker($queues, $interval, $logLevel);
+                    $this->startWorker($queues, $interval);
                 }
             }
         } else {
-            $this->startWorker($queues, $interval, $logLevel);
+            $this->startWorker($queues, $interval);
         }
 
         return 0;
@@ -71,41 +68,14 @@ class WorkCommand extends IlluminateCommand
 
     /**
      * @param array $queues
-     * @param int   $logLevel
      * @param int   $interval
      */
-    private function startWorker(array $queues, $interval = 5, $logLevel = Resque_Worker::LOG_NONE)
+    private function startWorker(array $queues, $interval = 5)
     {
-        $queues = array_map(function ($queue) {
-            return $this->manager->getQueueName($queue);
-        }, $queues);
-
         $worker = new Resque_Worker($queues);
-        $worker->logLevel = $logLevel;
 
         $this->info(sprintf('Starting worker %s', $worker));
         $worker->work($interval);
-    }
-
-    /**
-     * @return int
-     */
-    protected function getLogLevel()
-    {
-        switch ($this->verbosity) {
-            case OutputInterface::VERBOSITY_VERBOSE:
-                $logLevel = Resque_Worker::LOG_NORMAL;
-                break;
-
-            case OutputInterface::VERBOSITY_VERY_VERBOSE:
-                $logLevel = Resque_Worker::LOG_VERBOSE;
-                break;
-
-            default:
-                $logLevel = Resque_Worker::LOG_NONE;
-        }
-
-        return $logLevel;
     }
 
     /**
