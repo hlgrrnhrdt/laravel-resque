@@ -34,7 +34,8 @@ class ResqueServiceProvider extends ServiceProvider
     protected function registerResque()
     {
         $this->app->singleton('resque', function () {
-            return new Resque();
+            $prefix = $connection = $this->app['config']['resque.prefix'];
+            return (new Resque())->setPrefix($prefix);
         });
     }
 
