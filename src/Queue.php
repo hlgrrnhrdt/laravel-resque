@@ -9,14 +9,32 @@ namespace Hlgrrnhrdt\Resque;
 class Queue
 {
     protected $name;
+    /**
+     * @var ResqueManager
+     */
+    private $manager;
 
-    public function __construct($name)
+    /**
+     * Queue constructor.
+     *
+     * @param ResqueManager $manager
+     */
+    public function __construct(ResqueManager $manager)
     {
-        $this->name = $name;
+        $this->manager = $manager;
     }
 
+    /**
+     * @return \Resque_Job[]
+     */
     public function jobs()
     {
-        \Resque::redis()->lrange('queue:' . $this->name, 0, -1);
+        $result = $this->manager->redis()->lrange('queue:' . $this->name, 0, -1);
+        $jobs = [];
+        foreach ($result as $job) {
+            $jobs[] = new \Resque_Job($this->name, json_decode($job, true));
+        }
+
+        return $jobs;
     }
 }

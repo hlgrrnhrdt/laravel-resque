@@ -9,14 +9,19 @@ namespace Hlgrrnhrdt\Resque;
 abstract class Job
 {
     /**
+     * @var \Resque_Job
+     */
+    public $job;
+
+    /**
      * @var string
      */
-    protected $queue = 'default';
+    public $queue = 'default';
 
     /**
      * @var array
      */
-    protected $arguments = [];
+    public $args = [];
 
     /**
      * @return mixed
@@ -31,7 +36,7 @@ abstract class Job
      */
     public function arguments()
     {
-        return $this->arguments;
+        return $this->$args;
     }
 
     /**
@@ -44,4 +49,6 @@ abstract class Job
         $this->queue = $queue;
         return $this;
     }
+
+    abstract public function perform();
 }
