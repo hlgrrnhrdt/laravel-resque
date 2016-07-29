@@ -21,6 +21,13 @@ class WorkCommand extends IlluminateCommand
     protected $name = 'resque:work';
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Run a resque worker';
+
+    /**
      * @var \Hlgrrnhrdt\Resque\Resque
      */
     private $resque;
@@ -41,27 +48,12 @@ class WorkCommand extends IlluminateCommand
      */
     public function fire()
     {
-        $queues = $this->option('queue');
+        $queue = $this->option('queue');
         $interval = (int)$this->option('interval');
-        $count = (int)$this->option('count');
 
-        if ($count > 1) {
-            for ($i = 0; $i < $count; $i++) {
-                try {
-                    $pid = $this->resque->fork();
-                } catch (\RuntimeException $exception) {
-                    $this->error($exception->getMessage());
+        $queues = explode(',', $queue);
 
-                    return 1;
-                }
-
-                if (0 === $pid) {
-                    $this->startWorker($queues, $interval);
-                }
-            }
-        } else {
-            $this->startWorker($queues, $interval);
-        }
+        $this->startWorker($queues, $interval);
 
         return 0;
     }
@@ -73,8 +65,7 @@ class WorkCommand extends IlluminateCommand
     private function startWorker(array $queues, $interval = 5)
     {
         $worker = new Resque_Worker($queues);
-
-        $this->info(sprintf('Starting worker %s', $worker));
+        $this->info(\sprintf('Starting worker %s', $worker));
         $worker->work($interval);
     }
 
@@ -84,17 +75,8 @@ class WorkCommand extends IlluminateCommand
     protected function getOptions()
     {
         return [
-            [
-                'queue',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'The queue to work on',
-                ['default'],
-            ],
-            ['interval', null, InputOption::VALUE_OPTIONAL, 'The queue to work on', 5],
-            ['count', null, InputOption::VALUE_OPTIONAL, 'The queue to work on', 1],
+            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to work on', 'default'],
+            ['interval', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 5],
         ];
     }
-
-
 }
