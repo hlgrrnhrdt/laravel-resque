@@ -46,7 +46,6 @@ class WorkCommand extends IlluminateCommand
         $interval = (int)$this->option('interval');
         $count = (int)$this->option('count');
 
-        $queues = explode(',', $queue);
         $logLevel = $this->getLogLevel();
 
         if ($count > 1) {
@@ -60,11 +59,11 @@ class WorkCommand extends IlluminateCommand
                 }
 
                 if (0 === $pid) {
-                    $this->startWorker($queues, $interval, $logLevel);
+                    $this->startWorker($queue, $interval, $logLevel);
                 }
             }
         } else {
-            $this->startWorker($queues, $interval, $logLevel);
+            $this->startWorker($queue, $interval, $logLevel);
         }
 
         return 0;
