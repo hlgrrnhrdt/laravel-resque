@@ -36,7 +36,7 @@ abstract class Job
      */
     public function arguments()
     {
-        return $this->args;
+        return $this->args ?: [];
     }
 
     /**
@@ -56,6 +56,16 @@ abstract class Job
     {
         $this->queue = $queue;
         return $this;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    public function equals(Job $job)
+    {
+        return $this->name() === $job->name() && $this->arguments() === $job->arguments();
     }
 
     abstract public function perform();

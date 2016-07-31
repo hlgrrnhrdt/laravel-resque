@@ -59,7 +59,7 @@ class Resque
         $queue = new Queue($job->queue());
 
         foreach ($queue->jobs() as $queuedJob) {
-            if (true === $this->isSameJob($job, $queuedJob)) {
+            if (true === $job->equals($queuedJob)) {
                 return ($trackStatus) ? new \Resque_Job_Status($queuedJob->job->payload['id']) : null;
             }
         }
@@ -83,17 +83,5 @@ class Resque
     public function fork()
     {
         return \Resque::fork();
-    }
-
-    /**
-     * @param Job $job
-     * @param Job $queuedJob
-     *
-     * @return bool
-     */
-    protected function isSameJob(Job $job, Job $queuedJob)
-    {
-        return $job->name() === $queuedJob->name()
-            && count(array_intersect($job->arguments(), $queuedJob->arguments())) === count($job->arguments());
     }
 }
