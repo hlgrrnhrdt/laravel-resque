@@ -1,0 +1,22 @@
+{
+    "name": "hlgrrnhrdt/laravel-resque",
+    "authors": [
+        {
+            "name": "Holger Reinhardt",
+            "email": "hlgrrnhrdt@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/console": "^5.2",
+        "illuminate/config": "^5.2",
+        "danhunsaker/php-resque": "^1.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hlgrrnhrdt\\Resque\\": "src/"
+        }
+    }
+}
