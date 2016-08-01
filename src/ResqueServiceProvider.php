@@ -53,9 +53,15 @@ class ResqueServiceProvider extends ServiceProvider
         $host = isset($config['host']) ? $config['host'] : 'localhost';
         $port = isset($config['port']) ? $config['port'] : 6379;
         $database = isset($config['database']) ? $config['database'] : 0;
+        $password = isset($config['password']) ? $config['password'] : '';
 
         $server = implode(':', [$host, $port]);
+        if ($password) {
+            $server = implode('@', [$password, $server]);
+        }
 
-        \Resque::setBackend($server, $database);
+        $dsn = sprintf('redis://%s/%s', $server, $database);
+
+        \Resque::setBackend($dsn);
     }
 }
