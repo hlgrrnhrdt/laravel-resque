@@ -3,7 +3,7 @@
 This package provides tools for the following, and more:
 
 - Add jobs to queue
-- Console command to run a sigle worker
+- Console command to run a single worker
 
 ## Installation
 
