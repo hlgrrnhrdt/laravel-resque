@@ -3,6 +3,7 @@
 This package provides tools for the following, and more:
 
 - Add jobs to queue
+- Console command to run a single worker
 
 ## Installation
 
@@ -12,9 +13,8 @@ Via composer
 $ composer require hlgrrnhrdt/laravel-resque
 ```
 
-
-
-Copy the config the file ```config/resque.php``` from the package to your config folder.
+Copy the config file ```config/resque.php``` from the package to your config folder.
+Additionally a default redis connection needs to be configured in ```config/redis.php```.
 
 ### Laravel
 
