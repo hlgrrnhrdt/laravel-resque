@@ -3,6 +3,7 @@
 This package provides tools for the following, and more:
 
 - Add jobs to queue
+- Console command to run a sigle worker
 
 ## Installation
 
@@ -14,7 +15,7 @@ $ composer require hlgrrnhrdt/laravel-resque
 
 
 
-Copy the config the file ```config/resque.php``` from the package to your config folder.
+Copy the config file ```config/resque.php``` from the package to your config folder.
 
 ### Laravel
 
