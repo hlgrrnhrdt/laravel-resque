@@ -13,9 +13,8 @@ Via composer
 $ composer require hlgrrnhrdt/laravel-resque
 ```
 
-
-
 Copy the config file ```config/resque.php``` from the package to your config folder.
+Additionally a default redis connection needs to be configured in ```config/redis.php```.
 
 ### Laravel
 
