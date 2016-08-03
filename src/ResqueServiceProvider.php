@@ -57,7 +57,7 @@ class ResqueServiceProvider extends ServiceProvider
 
         $server = implode(':', [$host, $port]);
         if ($password) {
-            $server = implode('@', [$password, $server]);
+            $server = implode('@', [implode(':', ['', $password]), $server]);
         }
 
         $dsn = sprintf('redis://%s/%s', $server, $database);
