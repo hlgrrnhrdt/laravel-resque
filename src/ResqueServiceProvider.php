@@ -48,7 +48,11 @@ class ResqueServiceProvider extends ServiceProvider
 
     protected function setRedisConfig()
     {
-        $config = $this->app['config']['database.redis.default'];
+        $default = $this->app['config']['resque.default'];
+        $config = $this->app['config'][sprintf('database.redis.%s', $default)];
+        if (!$config) {
+            $config = $this->app['config']['database.redis.default'];
+        }
 
         $host = isset($config['host']) ? $config['host'] : 'localhost';
         $port = isset($config['port']) ? $config['port'] : 6379;
