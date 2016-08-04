@@ -18,6 +18,6 @@ return [
     |
     */
 
-    'prefix' => 'lethe_' . env('APP_ID'),
+    'prefix' => env('RESQUE_PREFIX'),
 
 ];
