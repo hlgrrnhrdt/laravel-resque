@@ -37,23 +37,6 @@ class Resque
      *
      * @return null|\Resque_Job_Status
      */
-    public function enqueue(Job $job, $trackStatus = false)
-    {
-        $id = \Resque::enqueue($job->queue(), $job->name(), $job->arguments(), $trackStatus);
-
-        if (true === $trackStatus) {
-            return new \Resque_Job_Status($id);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Job  $job
-     * @param bool $trackStatus
-     *
-     * @return null|\Resque_Job_Status
-     */
     public function enqueueOnce(Job $job, $trackStatus = false)
     {
         $queue = new Queue($job->queue());
@@ -64,7 +47,48 @@ class Resque
             }
         }
 
+        foreach ($this->working() as $workingJob) {
+            if (true === $job->equals($workingJob)) {
+                return ($trackStatus) ? new \Resque_Job_Status($workingJob->job->payload['id']) : null;
+            }
+        }
+
         return $this->enqueue($job, $trackStatus);
+    }
+
+    /**
+     * @return Job[]
+     */
+    private function working()
+    {
+        $jobs = [];
+        foreach (\Resque::redis()->smembers('workers') as $worker) {
+            $job = \Resque::redis()->get('worker:' . $worker);
+            $job = \json_decode($job, true);
+            if (!\json_last_error()) {
+                $jobs[] = (new \Resque_Job($job['queue'], $job['payload']))
+                    ->getInstance();
+            }
+        }
+
+        return $jobs;
+    }
+
+    /**
+     * @param Job  $job
+     * @param bool $trackStatus
+     *
+     * @return null|\Resque_Job_Status
+     */
+    public function enqueue(Job $job, $trackStatus = false)
+    {
+        $id = \Resque::enqueue($job->queue(), $job->name(), $job->arguments(), $trackStatus);
+
+        if (true === $trackStatus) {
+            return new \Resque_Job_Status($id);
+        }
+
+        return null;
     }
 
     /**
