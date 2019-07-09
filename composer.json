@@ -12,7 +12,7 @@
         "danhunsaker/php-resque": "^1.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.4"
+        "phpunit/phpunit": "^8.2"
     },
     "autoload": {
         "psr-4": {
